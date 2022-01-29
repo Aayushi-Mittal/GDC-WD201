@@ -91,8 +91,8 @@ $ python tasks.py report # Statistics"""
     def delete(self, args):
         priority = int(args[0])
         if priority in self.current_items.keys():
-            self.completed_items.pop(priority)
-            self.write_completed()
+            self.current_items.pop(priority)
+            self.write_current()
             print(f"Deleted item with priority {priority}")
         else:
             print(f"Error: item with priority {priority} does not exist. Nothing deleted.")
