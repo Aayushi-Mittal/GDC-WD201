@@ -106,8 +106,8 @@ $ python tasks.py report # Statistics"""
     def report(self):
         i=1
         print(f"Pending : {len(self.current_items)}")
-        for priority, task in self.current_items:
-            print(f"{i}. {task} [{priority}]")
+        for priority in self.current_items:
+            print(f"{i}. {self.current_items[priority]} [{priority}]")
             i+=1
         i=1
         print(f"\nCompleted : {len(self.completed_items)}")
