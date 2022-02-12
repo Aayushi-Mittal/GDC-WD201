@@ -37,7 +37,7 @@ def completed_tasks_view(request):
 
 
 def add_task_view(request):
-    task_value = request.GET.get("search")
+    task_value = request.GET.get("task")
     task_obj = Task(title=task_value)
     task_obj.save()
     return HttpResponseRedirect("/all_tasks")
