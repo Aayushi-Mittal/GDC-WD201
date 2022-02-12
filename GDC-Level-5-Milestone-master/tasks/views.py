@@ -1,12 +1,16 @@
 # Add all your views here
+from asyncio import tasks
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from tasks import views
 
-# tasks = ["This is my first task"]
-# completed_tasks = ["I am done", "second done"]
-tasks = []
-completed_tasks = []
+from tasks.models import Task
+
+
+def task():
+    return Task.objects.filter(deleted=False).filter(completed=False)
+
+def completed_tasks():
+    return Task.objects.filter(deleted=False).filter(completed=True)
 
 
 def all_tasks_view(request):
@@ -14,33 +18,36 @@ def all_tasks_view(request):
         request,
         "all_tasks.html",
         {
-            "tasks": tasks,
-            "completed_tasks": completed_tasks,
+            "tasks": task(),
+            "completed_tasks": completed_tasks(),
         },
     )
 
 
 def tasks_view(request):
+    search_term = request.GET.get("search")
+    tasks = task()
+    if search_term:
+        tasks = tasks.filter(title__icontains=search_term)
     return render(request, "tasks.html", {"tasks": tasks})
 
 
 def completed_tasks_view(request):
-    return render(request, "completed_tasks.html", {"completed_tasks": completed_tasks})
+    return render(request, "completedTasks.html", {"completed_tasks": completed_tasks()})
+
 
 def add_task_view(request):
-    task_value = request.GET.get("task")
-    if task_value:
-        tasks.append(task_value)
+    task_value = request.GET.get("search")
+    task_obj = Task(title=task_value)
+    task_obj.save()
     return HttpResponseRedirect("/all_tasks")
 
 
 def delete_task_view(request, index):
-    if index>=1 and index<=len(tasks):
-        del tasks[index - 1]
+    Task.objects.filter(id=index).update(deleted=True)
     return HttpResponseRedirect("/all_tasks")
 
 
 def complete_task_view(request, index):
-    if index>=1 and index<=len(tasks):
-        completed_tasks.append(tasks.pop(index - 1))
+    Task.objects.filter(id=index).update(completed=True)
     return HttpResponseRedirect("/all_tasks")
