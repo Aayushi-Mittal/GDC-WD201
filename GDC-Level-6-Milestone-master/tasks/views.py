@@ -1,16 +1,8 @@
 # Add all your views here
-from asyncio import tasks
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 
 from tasks.models import Task
-
-
-def task():
-    return Task.objects.filter(deleted=False).filter(completed=False)
-
-def completed_tasks():
-    return Task.objects.filter(deleted=False).filter(completed=True)
 
 
 def all_tasks_view(request):
@@ -18,22 +10,22 @@ def all_tasks_view(request):
         request,
         "all_tasks.html",
         {
-            "tasks": task(),
-            "completed_tasks": completed_tasks(),
+            "tasks": Task.objects.filter(deleted=False).filter(completed=False),
+            "completed_tasks": Task.objects.filter(deleted=False).filter(completed=True),
         },
     )
 
 
 def tasks_view(request):
     search_term = request.GET.get("search")
-    tasks = task()
+    tasks = Task.objects.filter(deleted=False).filter(completed=False)
     if search_term:
         tasks = tasks.filter(title__icontains=search_term)
     return render(request, "tasks.html", {"tasks": tasks})
 
 
 def completed_tasks_view(request):
-    return render(request, "completed_tasks.html", {"completed_tasks": completed_tasks()})
+    return render(request, "completed_tasks.html", {"completed_tasks": Task.objects.filter(deleted=False).filter(completed=True)})
 
 
 def add_task_view(request):
