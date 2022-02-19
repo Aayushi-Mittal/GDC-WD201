@@ -33,7 +33,7 @@ def tasks_view(request):
 
 
 def completed_tasks_view(request):
-    return render(request, "completedTasks.html", {"completed_tasks": completed_tasks()})
+    return render(request, "completed_tasks.html", {"completed_tasks": completed_tasks()})
 
 
 def add_task_view(request):
