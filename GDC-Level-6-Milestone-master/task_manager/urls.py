@@ -1,15 +1,15 @@
 from django.contrib import admin
 from django.urls import path
 
-from tasks import views
+from tasks.views import add_task_view, delete_task_view, TaskView
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # Add all your views here
-    path("all_tasks/", views.all_tasks_view),
-    path("tasks/", views.tasks_view),
-    path("completed_tasks/", views.completed_tasks_view),
-    path("add-task/", views.add_task_view),
-    path("delete-task/<int:index>/", views.delete_task_view),
-    path("complete_task/<int:index>/", views.complete_task_view),
+    # path("all_tasks/", all_tasks_view),
+    # path("completed_tasks/", completed_tasks_view),
+    path("tasks/", TaskView.as_view()),
+    path("add-task/", add_task_view),
+    path("delete-task/<int:index>/", delete_task_view),
+    # path("complete_task/<int:index>/", complete_task_view),
 ]

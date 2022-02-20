@@ -1,32 +1,50 @@
 # Add all your views here
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.views import View
+from django.views.generic.list import ListView
 
 from tasks.models import Task
 
 
-def all_tasks_view(request):
-    return render(
-        request,
-        "all_tasks.html",
-        {
-            "tasks": Task.objects.filter(deleted=False).filter(completed=False),
-            "completed_tasks": Task.objects.filter(deleted=False).filter(completed=True),
-        },
-    )
+# def all_tasks_view(request):
+#     return render(
+#         request,
+#         "all_tasks.html",
+#         {
+#             "tasks": Task.objects.filter(deleted=False).filter(completed=False),
+#             "completed_tasks": Task.objects.filter(deleted=False).filter(completed=True),
+#         },
+#     )
 
+# def completed_tasks_view(request):
+#     return render(request, "completed_tasks.html", {"completed_tasks": Task.objects.filter(deleted=False).filter(completed=True)})
 
-def tasks_view(request):
-    search_term = request.GET.get("search")
-    tasks = Task.objects.filter(deleted=False).filter(completed=False)
-    if search_term:
-        tasks = tasks.filter(title__icontains=search_term)
-    return render(request, "tasks.html", {"tasks": tasks})
+class TaskView(View):
 
+    def get(self, request):
+        search_term=request.GET.get("search")
+        tasks=Task.objects.filter(deleted=False)
+        if search_term:
+            tasks=tasks.filter(title__icontains=search_term)
+        return render(request,"tasks.html", {"tasks":tasks})
 
-def completed_tasks_view(request):
-    return render(request, "completed_tasks.html", {"completed_tasks": Task.objects.filter(deleted=False).filter(completed=True)})
+    def post(self, request):
+        pass
 
+class GenericTaskView(ListView):
+
+    queryset = Task.objects.filter(deleted=False)
+    templatname="tasks.html"
+    content_object_name="tasks"
+    paginate_by=5
+
+    def get_queryset(self):
+        search_term=self.request.GET.get("search")
+        task=Task.objects.filter(deleted=False)
+        if search_term:
+            tasks=tasks.filter(title__icontains=search_term)
+        return tasks
 
 def add_task_view(request):
     task_value = request.GET.get("task")
