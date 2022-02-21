@@ -36,6 +36,17 @@ class GenericTaskView(ListView):
         return tasks
 
 
+class CreateTaskView(View):
+    def get(self, request):
+        return render(request, "task_create.html")
+
+    def post(self, request):
+        task_value = request.POST.get("task")
+        task_obj = Task(title=task_value)
+        task_obj.save()
+        return HttpResponseRedirect("/tasks")
+
+
 class TaskView(View):
     def get(self, request):
         search_term = request.GET.get("search")
