@@ -55,4 +55,7 @@
         </div>
     {% endfor %}
     </ul>
+    {% for page in paginator.page_range %}
+    <li><a href="?page={{page}}&search={{request.GET.search}}">{{page}}</a></li>
+    {% endfor %}
 {% endblock content %}
