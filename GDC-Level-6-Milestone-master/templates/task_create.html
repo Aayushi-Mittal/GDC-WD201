@@ -5,8 +5,8 @@
     <div class="flex justify-center">
         <div class="mb-3 xl:w-96">
             <div class="input-group relative flex flex-wrap items-stretch w-full mb-4">
-                <input name="task" class="form-control relative flex-auto min-w-0 block px-3 py-1.5 text-base font-normal text-gray-700 bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:outline-none" placeholder="Search or Add Task" aria-label="Search" aria-describedby="button-addon3">
-                {% csrf_token %}
+                {% comment %} <input name="task" class="form-control relative flex-auto min-w-0 block px-3 py-1.5 text-base font-normal text-gray-700 bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:outline-none" placeholder="Search or Add Task" aria-label="Search" aria-describedby="button-addon3"> {% endcomment %}
+                {{form.as_p}} {% csrf_token %}
                 <button type="submit" class="btn inline-block px-6 py-2 border-2 border-gray-600 text-gray-600 font-medium text-xs leading-tight uppercase rounded hover:bg-gray-800 hover:bg-opacity-5 focus:outline-none transition duration-150 ease-in-out" type="button" id="button-addon3">CREATE</button>
             </div>
         </div>

@@ -3,6 +3,8 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.views import View
 from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView
+from django.forms import ModelForm
 
 from tasks.models import Task
 
@@ -20,6 +22,21 @@ from tasks.models import Task
 # def completed_tasks_view(request):
 #     return render(request, "completed_tasks.html", {"completed_tasks": Task.objects.filter(deleted=False).filter(completed=True)})
 
+class GenericTaskCreateView(CreateView):
+    model=Task
+    fields=("title", "description", "completed")
+    template_name="task_create.html"
+    success_url="/tasks"
+
+class CreateTaskView(View):
+    def get(self, request):
+        return render(request, "task_create.html")
+
+    def post(self, request):
+        task_value = request.POST.get("task")
+        task_obj = Task(title=task_value)
+        task_obj.save()
+        return HttpResponseRedirect("/tasks")
 
 class GenericTaskView(ListView):
 
@@ -34,18 +51,6 @@ class GenericTaskView(ListView):
         if search_term:
             tasks = tasks.filter(title__icontains=search_term)
         return tasks
-
-
-class CreateTaskView(View):
-    def get(self, request):
-        return render(request, "task_create.html")
-
-    def post(self, request):
-        task_value = request.POST.get("task")
-        task_obj = Task(title=task_value)
-        task_obj.save()
-        return HttpResponseRedirect("/tasks")
-
 
 class TaskView(View):
     def get(self, request):
