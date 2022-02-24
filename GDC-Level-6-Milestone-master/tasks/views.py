@@ -3,8 +3,8 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.views import View
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView
-from django.forms import ModelForm
+from django.views.generic.edit import CreateView, UpdateView
+from django.forms import ModelForm, ValidationError    
 
 from tasks.models import Task
 
@@ -22,11 +22,31 @@ from tasks.models import Task
 # def completed_tasks_view(request):
 #     return render(request, "completed_tasks.html", {"completed_tasks": Task.objects.filter(deleted=False).filter(completed=True)})
 
-class GenericTaskCreateView(CreateView):
+# Form
+class TaskCreateForm(ModelForm):
+    
+    def clean_title(self):
+        title = self.cleaned_data["title"]
+        if len(title) < 5:
+            raise ValidationError("Title too short.")
+        return title.upper()
+
+    class Meta:    
+        model = Task
+        fields = ["title", "description", "completed"]
+
+class GenericTaskUpdateView(UpdateView):
     model=Task
-    fields=("title", "description", "completed")
-    template_name="task_create.html"
+    form_class=TaskCreateForm
+    template_name="task_update.html"
     success_url="/tasks"
+
+# Passed form to view
+class GenericTaskCreateView(CreateView):
+    form_class = TaskCreateForm
+    template_name = "task_create.html"
+    success_url = "/tasks"
+
 
 class CreateTaskView(View):
     def get(self, request):
@@ -37,6 +57,7 @@ class CreateTaskView(View):
         task_obj = Task(title=task_value)
         task_obj.save()
         return HttpResponseRedirect("/tasks")
+
 
 class GenericTaskView(ListView):
 
@@ -51,6 +72,7 @@ class GenericTaskView(ListView):
         if search_term:
             tasks = tasks.filter(title__icontains=search_term)
         return tasks
+
 
 class TaskView(View):
     def get(self, request):
