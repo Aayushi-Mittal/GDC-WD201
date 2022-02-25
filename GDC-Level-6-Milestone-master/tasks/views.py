@@ -3,12 +3,20 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.views import View
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.forms import ModelForm, ValidationError    
 
 from tasks.models import Task
+class GenericTaskDeleteView(DeleteView):
+    model = Task
+    template_name = "task_delete.html"
+    success_url = "/tasks"
 
-
+class GenericTaskDetailView(DetailView):
+    model = Task
+    template_name = "task_details.html"
+    
 # def all_tasks_view(request):
 #     return render(
 #         request,
