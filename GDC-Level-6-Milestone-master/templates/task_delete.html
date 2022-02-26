@@ -1,15 +1,17 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
+<div class="flex flex-wrap flex-row justify-between items-center mb-8">
+	<div class="text-3xl font-bold">ToDo Manager - Delete</div>
+</div>
 
-{% block content %}
-<form action="" method="post">     
-    <div class="flex justify-center">
-        <div class="mb-3 xl:w-96">
-            <div class="input-group relative flex flex-wrap items-stretch w-full mb-4">
-                <label>Are you sure you want to delete "{{object.title}}" task?</label>
-                {% csrf_token %}
-                <input type="submit" value="confirm" class="btn inline-block px-6 py-2 border-2 border-gray-600 text-gray-600 font-medium text-xs leading-tight uppercase rounded hover:bg-gray-800 hover:bg-opacity-5 focus:outline-none transition duration-150 ease-in-out" type="button" id="button-addon3"/>
-            </div>
-        </div>
-    </div>
-</form> 
-{% endblock content %}
+<form action="/create-task/" method="post">
+	<div class="flex justify-center flex-col w-full text-base">
+		<label>Are you sure you want to delete "{{object.title}}" task?</label>
+		{% csrf_token %}
+		<input
+			type="submit"
+			value="confirm"
+			class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md font-base text-center mt-8 w-full"
+		/>
+	</div>
+</form>
+{% endblock content %} 

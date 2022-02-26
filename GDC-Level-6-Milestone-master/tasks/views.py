@@ -13,6 +13,31 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from tasks.models import Task
 
 
+class TaskCreateForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["title"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
+        self.fields["description"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
+        self.fields["priority"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg"
+        self.fields["completed"].widget.attrs["class"] = "p-5 mb-2 bg-gray-200/75"
+        
+    def clean_title(self):
+        title = self.cleaned_data["title"]
+        if len(title) < 5:
+            raise ValidationError("Title too short.")
+        return title
+
+    class Meta:
+        model = Task
+        fields = ["title", "description", "priority", "completed"]
+
+# class CustomUserCreationForm(UserCreationForm):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.fields["username"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
+#         self.fields["password"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
+#         self.fields["confirm_password"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
+
 class AuthorizedTaskManager(LoginRequiredMixin):
     def get_queryset(self):
         tasks = Task.objects.filter(deleted=False, user=self.request.user)
@@ -20,6 +45,7 @@ class AuthorizedTaskManager(LoginRequiredMixin):
 
 class UserLoginView(LoginView):
     template_name = "user_login.html"
+    success_url = "/user/login/"
 
 
 class UserCreateView(CreateView):
@@ -35,9 +61,11 @@ def session_storage_view(request):
         f"total views is {total_views} and the user is {request.user} and the user is {request.user.is_authenticated}"
     )
 
+
 class GenericTaskCompleteView(UpdateView):
     model = Task
     success_url = "/all-tasks"
+
 
 class GenericTaskDeleteView(DeleteView):
     model = Task
@@ -50,18 +78,6 @@ class GenericTaskDetailView(AuthorizedTaskManager, DetailView):
     template_name = "task_details.html"
 
 
-class TaskCreateForm(ModelForm):
-    def clean_title(self):
-        title = self.cleaned_data["title"]
-        if len(title) < 5:
-            raise ValidationError("Title too short.")
-        return title
-
-    class Meta:
-        model = Task
-        fields = ["title", "description", "completed"]
-
-
 class GenericTaskUpdateView(UpdateView):
     model = Task
     form_class = TaskCreateForm
@@ -69,28 +85,31 @@ class GenericTaskUpdateView(UpdateView):
     success_url = "/all-tasks"
 
 
-# Passed form to view
+def handle_priority(form, user):
+    priority_to_add = form.cleaned_data["priority"]
+    tasks_present = Task.objects.filter(
+        user=user, priority__gte=priority_to_add, completed=False, deleted=False
+    ).order_by("priority")
+    for task in tasks_present:
+        if task.priority == priority_to_add:
+            task.priority += 1
+            priority_to_add += 1
+        else:
+            break
+    Task.objects.bulk_update(tasks_present, ["priority"])
+
+
 class GenericTaskCreateView(CreateView):
     form_class = TaskCreateForm
     template_name = "task_create.html"
     success_url = "/tasks"
 
     def form_valid(self, form):
+        handle_priority(form, self.request.user)
         self.object = form.save()
         self.object.user = self.request.user
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
-
-
-class CreateTaskView(View):
-    def get(self, request):
-        return render(request, "task_create.html")
-
-    def post(self, request):
-        task_value = request.POST.get("task")
-        task_obj = Task(title=task_value)
-        task_obj.save()
-        return HttpResponseRedirect("/all-tasks")
 
 
 class GenericTaskView(ListView, LoginRequiredMixin):
@@ -102,22 +121,13 @@ class GenericTaskView(ListView, LoginRequiredMixin):
 
     def get_queryset(self):
         search_term = self.request.GET.get("search")
-        tasks = Task.objects.filter(completed=False, deleted=False, user=self.request.user)
+        tasks = Task.objects.filter(
+            completed=False, deleted=False, user=self.request.user
+        ).order_by("priority")
         if search_term:
             tasks = tasks.filter(title__icontains=search_term)
         return tasks
 
-
-class TaskView(View):
-    def get(self, request):
-        search_term = request.GET.get("search")
-        tasks = Task.objects.filter(deleted=False)
-        if search_term:
-            tasks = tasks.filter(title__icontains=search_term)
-        return render(request, "tasks.html", {"tasks": tasks})
-
-    def post(self, request):
-        pass
 
 class GenericAllTaskView(LoginRequiredMixin, ListView):
     queryset = Task.objects.filter(deleted=False)
@@ -126,7 +136,9 @@ class GenericAllTaskView(LoginRequiredMixin, ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        return Task.objects.filter(deleted=False, user=self.request.user)
+        return Task.objects.filter(deleted=False, user=self.request.user).order_by(
+            "priority"
+        )
 
 
 class GenericCompletedTaskView(LoginRequiredMixin, ListView):
@@ -138,20 +150,4 @@ class GenericCompletedTaskView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return Task.objects.filter(
             completed=True, deleted=False, user=self.request.user
-        )
-
-# def add_task_view(request):
-#     task_value = request.GET.get("task")
-#     task_obj = Task(title=task_value)
-#     task_obj.save()
-#     return HttpResponseRedirect("/tasks")
-
-
-# def delete_task_view(request, index):
-#     Task.objects.filter(id=index).update(deleted=True)
-#     return HttpResponseRedirect("/tasks")
-
-
-# def complete_task_view(request, index):
-#     Task.objects.filter(id=index).update(completed=True)
-#     return HttpResponseRedirect("/tasks")
+        ).order_by("priority")

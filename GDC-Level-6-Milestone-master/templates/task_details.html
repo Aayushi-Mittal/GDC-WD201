@@ -1,4 +1,20 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
+<div class="flex flex-wrap flex-row justify-between items-center mb-8">
+	<div class="text-3xl font-bold">ToDo Manager - Details</div>
+</div>
+<div class="flex justify-center flex-col w-full text-base">
+	<div class="font-medium text-black">Task:</div><br/>
+	<div class="bg-gray-200 text-md">{{task.title}}</div>
+	<br />
+	<div class="font-medium text-black">Description:</div><br/>
+	<div class="bg-gray-200 text-md">{{object.description}}</div>
+	<br />
+	<div class="bg-gray-200 text-md">Priority: {{object.priority}}</div>
+	<div class="bg-gray-200 text-md">Created At: {{object.created_date}}</div>
+</div>
+{% endblock content %} 
+
+{% comment %} {% extends "base.html" %}
 
 {% block content %}
     <div class="flex flex-col">
@@ -24,4 +40,4 @@
             </div>
         </div>
     </div>
-{% endblock content %}
+{% endblock content %} {% endcomment %}
