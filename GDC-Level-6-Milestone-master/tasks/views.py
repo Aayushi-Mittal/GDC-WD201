@@ -119,17 +119,6 @@ class TaskView(View):
     def post(self, request):
         pass
 
-# class GenericPendingTaskView(LoginRequiredMixin, ListView):
-#     queryset = Task.objects.filter(completed=False, deleted=False)
-#     template_name = "tasks.html"
-#     context_object_name = "tasks"
-#     paginate_by = 5
-
-#     def get_queryset(self):
-#         return Task.objects.filter(
-#             completed=False, deleted=False, user=self.request.user
-#         )
-
 class GenericAllTaskView(LoginRequiredMixin, ListView):
     queryset = Task.objects.filter(deleted=False)
     template_name = "all_tasks.html"
