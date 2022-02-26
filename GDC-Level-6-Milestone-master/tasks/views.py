@@ -8,8 +8,14 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.forms import ModelForm, ValidationError
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from tasks.models import Task
+
+
+class AuthorizedTaskManager(LoginRequiredMixin):
+    def get_queryset(self):
+        tasks = Task.objects.filter(deleted=False, user=self.request.user)
 
 
 class UserLoginView(LoginView):
@@ -25,16 +31,18 @@ class UserCreateView(CreateView):
 def session_storage_view(request):
     total_views = request.session.get("total_views", 0)
     request.session["total_views"] = total_views + 1
-    return HttpResponse(f"total views is {total_views}")
+    return HttpResponse(
+        f"total views is {total_views} and the user is {request.user} and the user is {request.user.is_authenticated}"
+    )
 
 
-class GenericTaskDeleteView(DeleteView):
+class GenericTaskDeleteView(AuthorizedTaskManager, DeleteView):
     model = Task
     template_name = "task_delete.html"
     success_url = "/tasks"
 
 
-class GenericTaskDetailView(DetailView):
+class GenericTaskDetailView(AuthorizedTaskManager, DetailView):
     model = Task
     template_name = "task_details.html"
 
@@ -64,6 +72,12 @@ class GenericTaskCreateView(CreateView):
     template_name = "task_create.html"
     success_url = "/tasks"
 
+    def form_valid(self, form):
+        self.object = form.save()
+        self.object.user = self.request.user
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
+
 
 class CreateTaskView(View):
     def get(self, request):
@@ -76,7 +90,7 @@ class CreateTaskView(View):
         return HttpResponseRedirect("/tasks")
 
 
-class GenericTaskView(ListView):
+class GenericTaskView(ListView, LoginRequiredMixin):
 
     queryset = Task.objects.filter(deleted=False)
     template_name = "tasks.html"
@@ -85,7 +99,7 @@ class GenericTaskView(ListView):
 
     def get_queryset(self):
         search_term = self.request.GET.get("search")
-        tasks = Task.objects.filter(deleted=False)
+        tasks = Task.objects.filter(deleted=False, user=self.request.user)
         if search_term:
             tasks = tasks.filter(title__icontains=search_term)
         return tasks
