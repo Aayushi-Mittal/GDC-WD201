@@ -35,11 +35,14 @@ def session_storage_view(request):
         f"total views is {total_views} and the user is {request.user} and the user is {request.user.is_authenticated}"
     )
 
+class GenericTaskCompleteView(UpdateView):
+    model = Task
+    success_url = "/all-tasks"
 
-class GenericTaskDeleteView(AuthorizedTaskManager, DeleteView):
+class GenericTaskDeleteView(DeleteView):
     model = Task
     template_name = "task_delete.html"
-    success_url = "/tasks"
+    success_url = "/all-tasks"
 
 
 class GenericTaskDetailView(AuthorizedTaskManager, DetailView):
@@ -52,7 +55,7 @@ class TaskCreateForm(ModelForm):
         title = self.cleaned_data["title"]
         if len(title) < 5:
             raise ValidationError("Title too short.")
-        return title.upper()
+        return title
 
     class Meta:
         model = Task
@@ -63,7 +66,7 @@ class GenericTaskUpdateView(UpdateView):
     model = Task
     form_class = TaskCreateForm
     template_name = "task_update.html"
-    success_url = "/tasks"
+    success_url = "/all-tasks"
 
 
 # Passed form to view
@@ -87,19 +90,19 @@ class CreateTaskView(View):
         task_value = request.POST.get("task")
         task_obj = Task(title=task_value)
         task_obj.save()
-        return HttpResponseRedirect("/tasks")
+        return HttpResponseRedirect("/all-tasks")
 
 
 class GenericTaskView(ListView, LoginRequiredMixin):
 
-    queryset = Task.objects.filter(deleted=False)
+    queryset = Task.objects.filter(completed=False, deleted=False)
     template_name = "tasks.html"
     context_object_name = "tasks"
     paginate_by = 5
 
     def get_queryset(self):
         search_term = self.request.GET.get("search")
-        tasks = Task.objects.filter(deleted=False, user=self.request.user)
+        tasks = Task.objects.filter(completed=False, deleted=False, user=self.request.user)
         if search_term:
             tasks = tasks.filter(title__icontains=search_term)
         return tasks
@@ -116,19 +119,50 @@ class TaskView(View):
     def post(self, request):
         pass
 
+# class GenericPendingTaskView(LoginRequiredMixin, ListView):
+#     queryset = Task.objects.filter(completed=False, deleted=False)
+#     template_name = "tasks.html"
+#     context_object_name = "tasks"
+#     paginate_by = 5
 
-def add_task_view(request):
-    task_value = request.GET.get("task")
-    task_obj = Task(title=task_value)
-    task_obj.save()
-    return HttpResponseRedirect("/tasks")
+#     def get_queryset(self):
+#         return Task.objects.filter(
+#             completed=False, deleted=False, user=self.request.user
+#         )
+
+class GenericAllTaskView(LoginRequiredMixin, ListView):
+    queryset = Task.objects.filter(deleted=False)
+    template_name = "all_tasks.html"
+    context_object_name = "tasks"
+    paginate_by = 5
+
+    def get_queryset(self):
+        return Task.objects.filter(deleted=False, user=self.request.user)
 
 
-def delete_task_view(request, index):
-    Task.objects.filter(id=index).update(deleted=True)
-    return HttpResponseRedirect("/tasks")
+class GenericCompletedTaskView(LoginRequiredMixin, ListView):
+    queryset = Task.objects.filter(completed=True, deleted=False)
+    template_name = "completed_tasks.html"
+    context_object_name = "tasks"
+    paginate_by = 5
+
+    def get_queryset(self):
+        return Task.objects.filter(
+            completed=True, deleted=False, user=self.request.user
+        )
+
+# def add_task_view(request):
+#     task_value = request.GET.get("task")
+#     task_obj = Task(title=task_value)
+#     task_obj.save()
+#     return HttpResponseRedirect("/tasks")
 
 
-def complete_task_view(request, index):
-    Task.objects.filter(id=index).update(completed=True)
-    return HttpResponseRedirect("/tasks")
+# def delete_task_view(request, index):
+#     Task.objects.filter(id=index).update(deleted=True)
+#     return HttpResponseRedirect("/tasks")
+
+
+# def complete_task_view(request, index):
+#     Task.objects.filter(id=index).update(completed=True)
+#     return HttpResponseRedirect("/tasks")
