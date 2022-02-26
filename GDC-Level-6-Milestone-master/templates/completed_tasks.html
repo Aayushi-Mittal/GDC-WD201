@@ -1,32 +1,30 @@
-{% extends "base.html" %} {% block content %}
-<div class="flex flex-wrap flex-row justify-between items-center pb-4">
-  <div class="text-3xl font-bold">Hi {{request.user}}!</div>
-  <div class="text-lg text-red-600" href="/user/logout">Log out</div>
-</div>
-<div class="text-xs text-gray-600 pb-3">of tasks completed</div>
+{% extends "base_tabs.html" %} 
+
+{% block content2 %}
+
 <ul class="flex flex-wrap justify-start items-center">
-  <li class="mr-2">
-    <a
-      href="/all-tasks/"
-      class="inline-block py-2 px-4 text-base font-semibold text-center text-gray-600 rounded-full hover:text-gray-900 hover:bg-gray-100"
-      >All</a
-    >
-  </li>
-  <li class="mr-2">
-    <a
-      href="/tasks/"
-      class="inline-block py-2 px-4 text-base font-semibold text-center text-gray-600 rounded-full hover:text-gray-900 hover:bg-gray-100"
-      >Pending</a
-    >
-  </li>
-  <li>
-    <a href="/completed-tasks/"
+    <li class="mr-2">
+      <a
+        href="/all-tasks/"
+        class="inline-block py-2 px-4 text-base font-semibold text-center text-gray-600 rounded-full hover:text-gray-900 hover:bg-gray-100"
+        >All</a
+      >
+    </li>
+    <li class="mr-2">
+      <a
+        href="/tasks/"
+        class="inline-block py-2 px-4 text-base font-semibold text-center text-gray-600 rounded-full hover:text-gray-900 hover:bg-gray-100"
+        >Pending</a
+      >
+    </li>
+    <li>
+      <a href="/completed-tasks/"
       class="inline-block py-2 px-4 text-base font-semibold text-center text-red-600 bg-red-100 rounded-full active"
       aria-current="page"
       >Completed</a
-    >
-  </li>
-</ul>
+      >
+    </li>
+  </ul>
 
 <ul class="flex flex-col mt-3">
   {% for task in tasks %}
@@ -59,16 +57,5 @@
   </div>
   {% endfor %}
 </ul>
-<a href="/create-task/"><button
-    class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md font-base text-center mt-3 w-full"
-  >
-    Add
-  </button></a>
-<ul class="flex flex-row flex-wrap justify-center mt-2">
-  {% for page in paginator.page_range %}
-  <li class="text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-200 p-1">
-    <a href="?page={{page}}&search={{request.GET.search}}">{{page}}</a>
-  </li>
-  | {% endfor %}
-</ul>
-{% endblock content %}
+
+{% endblock content2 %}

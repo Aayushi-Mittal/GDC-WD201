@@ -1,32 +1,30 @@
-{% extends "base.html" %} {% block content %}
-<div class="flex flex-wrap flex-row justify-between items-center pb-4">
-  <div class="text-3xl font-bold">Hi {{request.user}}!</div>
-  <div class="text-lg text-red-600" href="/user/logout">Log out</div>
-</div>
-<div class="text-xs text-gray-600 pb-3">of tasks completed</div>
+{% extends "base_tabs.html" %} 
+
+{% block content2 %}
+
 <ul class="flex flex-wrap justify-start items-center">
-  <li class="mr-2">
-    <a
-      href="/all-tasks/"
-      class="inline-block py-2 px-4 text-base font-semibold text-center text-red-600 bg-red-100 rounded-full active"
-      aria-current="page"
-      >All</a
-    >
-  </li>
-  <li class="mr-2">
-    <a
-      href="/tasks/"
-      class="inline-block py-2 px-4 text-base font-semibold text-center text-gray-600 rounded-full hover:text-gray-900 hover:bg-gray-100"
-      >Pending</a
-    >
-  </li>
-  <li>
-    <a href="/completed-tasks/"
-      class="inline-block py-2 px-4 text-base font-semibold text-center text-gray-600 rounded-full hover:text-gray-900 hover:bg-gray-100"
-      >Completed</a
-    >
-  </li>
-</ul>
+    <li class="mr-2">
+      <a
+        href="/all-tasks/"
+        class="inline-block py-2 px-4 text-base font-semibold text-center text-red-600 bg-red-100 rounded-full active"
+        aria-current="page"
+        >All</a
+      >
+    </li>
+    <li class="mr-2">
+      <a
+        href="/tasks/"
+        class="inline-block py-2 px-4 text-base font-semibold text-center text-gray-600 rounded-full hover:text-gray-900 hover:bg-gray-100"
+        >Pending</a
+      >
+    </li>
+    <li>
+      <a href="/completed-tasks/"
+        class="inline-block py-2 px-4 text-base font-semibold text-center text-gray-600 rounded-full hover:text-gray-900 hover:bg-gray-100"
+        >Completed</a
+      >
+    </li>
+  </ul>
 
 <ul class="flex flex-col mt-3">
   {% for task in tasks %}
@@ -70,85 +68,6 @@
   </div>
   {% endfor %}
 </ul>
-<a href="/create-task/"><button
-  class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md font-base text-center mt-3 w-full"
->
-  Add
-</button></a>
-<ul class="flex flex-row flex-wrap justify-center mt-2">
-  {% for page in paginator.page_range %}
-  <li class="text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-200 p-1">
-    <a href="?page={{page}}&search={{request.GET.search}}">{{page}}</a>
-  </li>
-  | {% endfor %}
-</ul>
-{% endblock content %}
 
+{% endblock content2 %}
 
-
-{% comment %} {% extends "base.html" %}
-
-{% block content %}
-    <div class="px-4 py-5 sm:px-6 w-full border dark:bg-gray-800 bg-white shadow mb-2 rounded-md">
-        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-            Pending Tasks
-        </h3>
-    </div>
-    <ul class="flex flex-col">
-    {% for task in tasks %}
-        <li class="border-gray-400 flex flex-row mb-2">
-            <div class="shadow border select-none bg-white flex flex-1 justify-around rounded-md p-4">
-                <div class="flex-1 pl-1 md:mr-16">
-                    <div class="font-medium text-black">
-                        {{task.title}}
-                    </div>
-                    <div class="text-gray-500 text-xs">
-                        {{task.created_date}}
-                    </div>
-                </div>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <p class="px-2 max-h-6 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                    pending
-                </p>
-                <a href="/delete-task/{{ task.id }}" class="px-2"><i class="fas fa-trash rounded-full bg-red-100 text-red-800"></i></a>
-                <a href="/complete_task/{{ task.id }}" class="px-2"><i class="fas fa-check rounded-full bg-green-100 text-green-800"></i></a>
-            </div>
-        </li>
-    {% empty %}
-        <div class="font-medium text-gray-500 text-center py-10">
-            No Pending Tasks
-        </div>
-    {% endfor %}
-    </ul>
-    <br>
-    <div class="px-4 py-5 sm:px-6 w-full border dark:bg-gray-800 bg-white shadow mb-2 rounded-md">
-        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-            Completed Tasks
-        </h3>
-    </div>
-    <ul class="flex flex-col">
-    {% for task in completed_tasks %}
-        <li class="border-gray-400 flex flex-row mb-2">
-            <div class="shadow border select-none bg-white flex flex-1 justify-around rounded-md p-4">
-                <div class="flex-1 pl-1 md:mr-16">
-                    <div class="font-medium text-black">
-                        {{task.title}}
-                    </div>
-                    <div class="text-gray-500 text-xs">
-                        {{task.created_date}}
-                    </div>
-                </div>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <p class="px-2 max-h-6 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    completed
-                </p>
-                <a href="/delete-task/{{ task.id }}" class="px-2"><i class="fas fa-trash rounded-full bg-red-100 text-red-800"></i></a>
-            </div>
-        </li>
-    {% empty %}
-        <div class="font-medium text-gray-500 text-center py-10">
-            No Completed Tasks
-        </div>
-    {% endfor %}
-    </ul>
-{% endblock content %} {% endcomment %}

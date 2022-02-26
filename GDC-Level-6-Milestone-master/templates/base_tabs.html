@@ -4,35 +4,11 @@
 
 <div class="flex flex-wrap flex-row justify-between items-center pb-4">
   <div class="text-3xl font-bold">Hi {{request.user}}!</div>
-  <div class="text-lg text-red-600" href="/user/logout">Log out</div>
+  <div class="text-lg text-red-600"><a href="/user/logout">Log out</a></div>
 </div>
 <div class="text-xs text-gray-600 pb-3">of tasks completed</div>
-<ul class="flex flex-wrap justify-start items-center">
-  <li class="mr-2">
-    <a
-      href="/all-tasks/"
-      class="inline-block py-2 px-4 text-base font-semibold text-center text-gray-600 rounded-full hover:text-gray-900 hover:bg-gray-100"
-      aria-current="page"
-      >All</a
-    >
-  </li>
-  <li class="mr-2">
-    <a
-      href="/tasks/"
-      class="inline-block py-2 px-4 text-base font-semibold text-center text-red-600 bg-red-100 rounded-full active"
-      aria-current="page"
-      >Pending</a
-    >
-  </li>
-  <li>
-    <a href="/completed-tasks/"
-      class="inline-block py-2 px-4 text-base font-semibold text-center text-gray-600 rounded-full hover:text-gray-900 hover:bg-gray-100"
-      >Completed</a
-    >
-  </li>
-</ul>
     
-{% block content %}
+{% block content2 %}
 {% endblock %}
 
 <a href="/create-task/"><button
