@@ -1,53 +1,62 @@
 # Add all your views here
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from django.forms import ModelForm, ValidationError    
+from django.forms import ModelForm, ValidationError
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.views import LoginView
 
 from tasks.models import Task
+
+
+class UserLoginView(LoginView):
+    template_name = "user_login.html"
+
+
+class UserCreateView(CreateView):
+    form_class = UserCreationForm
+    template_name = "user_signup.html"
+    success_url = "/user/login"
+
+
+def session_storage_view(request):
+    total_views = request.session.get("total_views", 0)
+    request.session["total_views"] = total_views + 1
+    return HttpResponse(f"total views is {total_views}")
+
+
 class GenericTaskDeleteView(DeleteView):
     model = Task
     template_name = "task_delete.html"
     success_url = "/tasks"
 
+
 class GenericTaskDetailView(DetailView):
     model = Task
     template_name = "task_details.html"
-    
-# def all_tasks_view(request):
-#     return render(
-#         request,
-#         "all_tasks.html",
-#         {
-#             "tasks": Task.objects.filter(deleted=False).filter(completed=False),
-#             "completed_tasks": Task.objects.filter(deleted=False).filter(completed=True),
-#         },
-#     )
 
-# def completed_tasks_view(request):
-#     return render(request, "completed_tasks.html", {"completed_tasks": Task.objects.filter(deleted=False).filter(completed=True)})
 
-# Form
 class TaskCreateForm(ModelForm):
-    
     def clean_title(self):
         title = self.cleaned_data["title"]
         if len(title) < 5:
             raise ValidationError("Title too short.")
         return title.upper()
 
-    class Meta:    
+    class Meta:
         model = Task
         fields = ["title", "description", "completed"]
 
+
 class GenericTaskUpdateView(UpdateView):
-    model=Task
-    form_class=TaskCreateForm
-    template_name="task_update.html"
-    success_url="/tasks"
+    model = Task
+    form_class = TaskCreateForm
+    template_name = "task_update.html"
+    success_url = "/tasks"
+
 
 # Passed form to view
 class GenericTaskCreateView(CreateView):
