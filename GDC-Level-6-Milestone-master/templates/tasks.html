@@ -44,15 +44,15 @@
 				class="p-2 bg-red-500 rounded-lg text-center text-white text-sm mr-2"
 				><i class="fas fa-trash"></i
 			></a>
-			<a
+			{% comment %} <a
 				href="/complete_task/{{ task.id }}"
 				class="p-2 bg-green-500 rounded-lg text-center text-white text-sm mr-2"
 				><i class="fas fa-check"></i
-			></a>
+			></a> {% endcomment %}
 			<a
 				href="/update-task/{{ task.id }}"
 				class="p-2 bg-teal-500 rounded-lg text-center text-white text-sm"
-				><i class="fas fa-pencil"></i
+				><i class="fas fa-edit"></i
 			></a>
 		</div>
 	</li>

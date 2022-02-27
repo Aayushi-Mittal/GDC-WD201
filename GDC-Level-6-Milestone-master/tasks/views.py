@@ -142,6 +142,8 @@ class GenericTaskCreateView(CreateView):
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
+class IndexView(View):
+    template_name = "index.html"
 
 class GenericTaskView(ListView, LoginRequiredMixin):
 

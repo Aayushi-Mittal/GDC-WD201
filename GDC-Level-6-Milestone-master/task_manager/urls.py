@@ -4,10 +4,11 @@ from django.contrib.auth.views import LogoutView
 
 # from tasks import views
 
-from tasks.views import session_storage_view, GenericTaskView, GenericTaskCreateView, GenericTaskUpdateView, GenericTaskDeleteView, GenericTaskDetailView, UserCreateView, UserLoginView, GenericAllTaskView, GenericCompletedTaskView, GenericTaskCompleteView;
+from tasks.views import session_storage_view, GenericTaskView, GenericTaskCreateView, GenericTaskUpdateView, GenericTaskDeleteView, GenericTaskDetailView, UserCreateView, UserLoginView, GenericAllTaskView, GenericCompletedTaskView, GenericTaskCompleteView, IndexView;
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # path("index/",  IndexView.as_view()),
     path("tasks/", GenericTaskView.as_view()),
     path("all-tasks/", GenericAllTaskView.as_view()),
     path("completed-tasks/", GenericCompletedTaskView.as_view()),
