@@ -39,8 +39,12 @@ class TaskCreateForm(ModelForm):
 #         self.fields["confirm_password"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
 
 class AuthorizedTaskManager(LoginRequiredMixin):
-    def get_queryset(self):
-        tasks = Task.objects.filter(deleted=False, user=self.request.user)
+    login_url = "/user/login"
+    success_url = "/tasks"
+    model = Task
+
+    def get_success_url(self):
+        return "/tasks"
 
 
 class UserLoginView(LoginView):

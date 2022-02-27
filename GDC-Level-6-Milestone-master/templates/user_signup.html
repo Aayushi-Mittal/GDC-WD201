@@ -8,8 +8,7 @@
 		{{ form.non_field_errors }}
 		<div class="fieldWrapper">
 			{{ form.username.errors }}
-			<label for="{{ form.username.id_for_label }}">Username:</label
-			><br />
+			<label for="{{ form.username.id_for_label }}">Username:</label><br />
 			<ul class="list-disc text-xs text-gray-500">
 				<li>
 					150 characters or fewer. Letters, digits and @/./+/-/_ only.
@@ -31,24 +30,23 @@
 				<li>Your password can't be a commonly used password.</li>
 				<li>Your password can't be entirely numeric.</li>
 			</ul>
-			{{ form.password }}
+			<div class="p-2 mb-2 bg-gray-200/75 rounded-lg w-full">
+			{{ form.password1 }}
+			</div>
 		</div>
 		<div class="fieldWrapper">
 			{{ form.confirm_password.errors }}
-			<label for="{{ form.confirm_password.id_for_label }}"
-				>Confirm Password:</label
-			>
+			<label for="{{ form.confirm_password.id_for_label }}">Confirm Password:</label>
 			<ul class="list-disc text-xs text-gray-500">
 				<li>Enter the same password as before, for verification.</li>
 			</ul>
 			<div class="p-2 mb-2 bg-gray-200/75 rounded-lg w-full">
-				{{ form.confirm_password }}
+				{{ form.password2 }}
 			</div>
 		</div>
 		{% csrf_token %}
 		<button
-			class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md font-base text-center mt-8 w-full"
-		>
+			class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md font-base text-center mt-8 w-full">
 			Signup
 		</button>
 	</div>
@@ -58,16 +56,11 @@
 <form action="" method="post">
 	<div class="flex justify-center">
 		<div class="mb-3 xl:w-96">
-			<div
-				class="input-group relative flex flex-wrap items-stretch w-full mb-4"
-			>
+			<div class="input-group relative flex flex-wrap items-stretch w-full mb-4">
 				{{form.as_p}} {% csrf_token %}
-				<button
-					type="submit"
+				<button type="submit"
 					class="btn inline-block px-6 py-2 border-2 border-gray-600 text-gray-600 font-medium text-xs leading-tight uppercase rounded hover:bg-gray-800 hover:bg-opacity-5 focus:outline-none transition duration-150 ease-in-out"
-					type="button"
-					id="button-addon3"
-				>
+					type="button" id="button-addon3">
 					SIGN UP
 				</button>
 			</div>
