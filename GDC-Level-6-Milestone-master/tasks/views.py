@@ -82,7 +82,7 @@ class UserLoginView(LoginView):
 class UserCreateView(CreateView):
     form_class = CustomUserCreationForm
     template_name = "user_signup.html"
-    success_url = "/user/login"
+    success_url = "/user/login/"
 
 
 def session_storage_view(request):
@@ -91,7 +91,6 @@ def session_storage_view(request):
     return HttpResponse(
         f"total views is {total_views} and the user is {request.user} and the user is {request.user.is_authenticated}"
     )
-
 
 class GenericTaskCompleteView(AuthorizedTaskManager, UpdateView):
     model = Task
@@ -109,13 +108,6 @@ class GenericTaskDetailView(AuthorizedTaskManager, DetailView):
     template_name = "task_details.html"
 
 
-class GenericTaskUpdateView(AuthorizedTaskManager, UpdateView):
-    model = Task
-    form_class = TaskCreateForm
-    template_name = "task_update.html"
-    success_url = "/all-tasks"
-
-
 def handle_priority(form, user):
     priority_to_add = form.cleaned_data["priority"]
     tasks_present = Task.objects.filter(
@@ -130,10 +122,25 @@ def handle_priority(form, user):
     Task.objects.bulk_update(tasks_present, ["priority"])
 
 
-class GenericTaskCreateView(CreateView):
+class GenericTaskUpdateView(AuthorizedTaskManager, UpdateView):
+    model = Task
+    form_class = TaskCreateForm
+    template_name = "task_update.html"
+    success_url = "/all-tasks"
+
+    def form_valid(self, form):
+        if "priority" in form.changed_data:
+            handle_priority(form, self.request.user)
+        self.object = form.save()
+        self.object.user = self.request.user
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class GenericTaskCreateView(LoginRequiredMixin, CreateView):
     form_class = TaskCreateForm
     template_name = "task_create.html"
-    success_url = "/tasks"
+    success_url = "/all-tasks"
 
     def form_valid(self, form):
         handle_priority(form, self.request.user)
@@ -142,8 +149,10 @@ class GenericTaskCreateView(CreateView):
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
 
+
 class IndexView(View):
     template_name = "index.html"
+
 
 class GenericTaskView(ListView, LoginRequiredMixin):
 
