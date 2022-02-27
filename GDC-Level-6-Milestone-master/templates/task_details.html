@@ -1,43 +1,41 @@
 {% extends "base.html" %} {% block content %}
-<div class="flex flex-wrap flex-row justify-between items-center mb-8">
-	<div class="text-3xl font-bold">ToDo Manager - Details</div>
-</div>
-<div class="flex justify-center flex-col w-full text-base">
-	<div class="font-medium text-black">Task:</div><br/>
-	<div class="bg-gray-200 text-md">{{task.title}}</div>
-	<br />
-	<div class="font-medium text-black">Description:</div><br/>
-	<div class="bg-gray-200 text-md">{{object.description}}</div>
-	<br />
-	<div class="bg-gray-200 text-md">Priority: {{object.priority}}</div>
-	<div class="bg-gray-200 text-md">Created At: {{object.created_date}}</div>
-</div>
-{% endblock content %} 
+{% csrf_token %}
+<h2 class="text-4xl font-bold m-3 p-1">Title:</h2>
+<p class="text-lg m-3 p-1">{{object.title}}</p>
+<p>
+    <b class="text-lg font-bold m-3 p-1">Created On:</b>
+    {{object.created_date}}<br />
+    <b class="text-lg font-bold m-3 p-1">Priority:</b> {{object.priority}}
+</p>
+<br />
+<h2 class="text-4xl font-bold m-3 p-1">Description:</h2>
+<p class="text-lg m-3 p-1">{{object.description}}</p>
+{% endblock content %}
 
 {% comment %} {% extends "base.html" %}
 
 {% block content %}
-    <div class="flex flex-col">
-        <div class="border-gray-400 flex flex-row mb-2">
-            <div class="shadow border select-none bg-white flex flex-1 justify-around rounded-md p-4">
-                <div class="flex-1 pl-1 md:mr-16">
-                    <div class="font-medium text-black">
-                        Task:
-                    </div>
-                    <div class="text-gray-500 text-s">
-                        {{task.title}}
-                    </div><br/>
-                    <div class="font-medium text-black">
-                        Description:
-                    </div>
-                    <div class="text-gray-500 text-s">
-                        {{object.description}}
-                    </div><br/>
-                    <div class="text-gray-500 text-xs">
-                        Created At: {{object.created_date}}
-                    </div>
+<div class="flex flex-col">
+    <div class="border-gray-400 flex flex-row mb-2">
+        <div class="shadow border select-none bg-white flex flex-1 justify-around rounded-md p-4">
+            <div class="flex-1 pl-1 md:mr-16">
+                <div class="font-medium text-black">
+                    Task:
+                </div>
+                <div class="text-gray-500 text-s">
+                    {{object.title}}
+                </div><br />
+                <div class="font-medium text-black">
+                    Description:
+                </div>
+                <div class="text-gray-500 text-s">
+                    {{object.description}}
+                </div><br />
+                <div class="text-gray-500 text-xs">
+                    Created At: {{object.created_date}}
                 </div>
             </div>
         </div>
     </div>
+</div>
 {% endblock content %} {% endcomment %}
