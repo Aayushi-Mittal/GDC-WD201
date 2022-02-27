@@ -9,6 +9,7 @@ from django.forms import ModelForm, ValidationError
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 from tasks.models import Task
 
@@ -16,11 +17,17 @@ from tasks.models import Task
 class TaskCreateForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["title"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
-        self.fields["description"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
-        self.fields["priority"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg"
+        self.fields["title"].widget.attrs[
+            "class"
+        ] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
+        self.fields["description"].widget.attrs[
+            "class"
+        ] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
+        self.fields["priority"].widget.attrs[
+            "class"
+        ] = "p-2 mb-2 bg-gray-200/75 rounded-lg"
         self.fields["completed"].widget.attrs["class"] = "p-5 mb-2 bg-gray-200/75"
-        
+
     def clean_title(self):
         title = self.cleaned_data["title"]
         if len(title) < 5:
@@ -31,29 +38,49 @@ class TaskCreateForm(ModelForm):
         model = Task
         fields = ["title", "description", "priority", "completed"]
 
-# class CustomUserCreationForm(UserCreationForm):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.fields["username"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
-#         self.fields["password"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
-#         self.fields["confirm_password"].widget.attrs["class"] = "p-2 mb-2 bg-gray-200/75 rounded-lg w-full"
 
 class AuthorizedTaskManager(LoginRequiredMixin):
     login_url = "/user/login"
     success_url = "/tasks"
     model = Task
+    # Only authorized user can see their tasks
+    def get_queryset(self):
+        return Task.objects.filter(deleted=False, user=self.request.user)
 
-    def get_success_url(self):
-        return "/tasks"
+
+class CustomUserCreationForm(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs[
+            "class"
+        ] = "p-1 mb-2 bg-gray-200/75 rounded-lg w-full"
+        self.fields["password1"].widget.attrs[
+            "class"
+        ] = "p-1 mb-2 bg-gray-200/75 rounded-lg w-full"
+        self.fields["password2"].widget.attrs[
+            "class"
+        ] = "p-1 mb-2 bg-gray-200/75 rounded-lg w-full"
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs[
+            "class"
+        ] = "p-1 mb-2 bg-gray-200/75 rounded-lg w-full"
+        self.fields["password"].widget.attrs[
+            "class"
+        ] = "p-1 mb-2 bg-gray-200/75 rounded-lg w-full"
 
 
 class UserLoginView(LoginView):
+    form_class = CustomAuthenticationForm
     template_name = "user_login.html"
     success_url = "/user/login/"
 
 
 class UserCreateView(CreateView):
-    form_class = UserCreationForm
+    form_class = CustomUserCreationForm
     template_name = "user_signup.html"
     success_url = "/user/login"
 
@@ -66,12 +93,12 @@ def session_storage_view(request):
     )
 
 
-class GenericTaskCompleteView(UpdateView):
+class GenericTaskCompleteView(AuthorizedTaskManager, UpdateView):
     model = Task
     success_url = "/all-tasks"
 
 
-class GenericTaskDeleteView(DeleteView):
+class GenericTaskDeleteView(AuthorizedTaskManager, DeleteView):
     model = Task
     template_name = "task_delete.html"
     success_url = "/all-tasks"
@@ -82,7 +109,7 @@ class GenericTaskDetailView(AuthorizedTaskManager, DetailView):
     template_name = "task_details.html"
 
 
-class GenericTaskUpdateView(UpdateView):
+class GenericTaskUpdateView(AuthorizedTaskManager, UpdateView):
     model = Task
     form_class = TaskCreateForm
     template_name = "task_update.html"

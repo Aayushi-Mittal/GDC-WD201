@@ -1,28 +1,27 @@
 {% extends "base.html" %} {% block content %}
 <div class="flex flex-wrap flex-row justify-between items-center mb-8">
-    <div class="text-3xl font-bold">ToDo Manager - LOGIN</div>
+	<div class="text-3xl font-bold text-center">ToDo Manager - LOGIN</div>
 </div>
 
 <form action="" method="post">
-    <div class="flex justify-center flex-col w-full text-base">
-        {{ form.non_field_errors }}
-        <div class="fieldWrapper">
-            {{ form.username.errors }}
-            <label for="{{ form.username.id_for_label }}">Username:</label>
-            <div class="p-2 mb-2 bg-gray-200/75 rounded-lg w-full">
-                {{ form.username }}</div>
-        </div>
-        <div class="fieldWrapper">
-            {{ form.password.errors }}
-            <label for="{{ form.password.id_for_label }}">Password:</label>
-            <div class="p-2 mb-2 bg-gray-200/75 rounded-lg w-full">
-                {{ form.password }}</div>
-        </div>
-        {% csrf_token %}
-        <button
-            class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md font-base text-center mt-8 w-full">
-            Login
-        </button>
-    </div>
+	<div class="flex justify-center flex-col w-full text-base">
+		<div class="fieldWrapper">
+			<label for="{{ form.username.id_for_label }}">Username:</label>
+			{{ form.username }}
+			<div class="text-xs text-red-600 py-1">{{ form.username.errors }}</div>
+		</div>
+		<div class="fieldWrapper">
+			<label for="{{ form.password.id_for_label }}">Password:</label>
+			{{ form.password }}
+			<div class="text-xs text-red-600 py-1">{{ form.password.errors }}</div>
+		</div>
+		<div class="text-xs text-red-600 py-1">{{ form.non_field_errors }}</div>
+		{% csrf_token %}
+		<button
+			class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md font-base text-center mt-8 w-full"
+		>
+			Login
+		</button>
+	</div>
 </form>
 {% endblock content %}
