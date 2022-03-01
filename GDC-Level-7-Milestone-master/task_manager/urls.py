@@ -4,14 +4,27 @@ from django.contrib.auth.views import LogoutView
 
 # from tasks import views
 
-from tasks.views import session_storage_view, GenericTaskView, GenericTaskCreateView, GenericTaskUpdateView, GenericTaskDeleteView, GenericTaskDetailView, UserCreateView, UserLoginView, GenericAllTaskView, GenericCompletedTaskView, GenericTaskCompleteView, IndexView
+from tasks.views import (
+    session_storage_view,
+    GenericTaskView,
+    GenericTaskCreateView,
+    GenericTaskUpdateView,
+    GenericTaskDeleteView,
+    GenericTaskDetailView,
+    UserCreateView,
+    UserLoginView,
+    GenericAllTaskView,
+    GenericCompletedTaskView,
+    GenericTaskCompleteView,
+    IndexView,
+)
 
 from tasks.apiviews import TaskListAPI, TaskViewSet
 
 from rest_framework.routers import SimpleRouter
 
-router=SimpleRouter()
-router.register("api/tsask", TaskViewSet)
+router = SimpleRouter()
+router.register("api/task", TaskViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -29,4 +42,4 @@ urlpatterns = [
     path("user/login/", UserLoginView.as_view()),
     path("user/logout/", LogoutView.as_view()),
     path("sessiontest/", session_storage_view),
-] + router.url
+] + router.urls
