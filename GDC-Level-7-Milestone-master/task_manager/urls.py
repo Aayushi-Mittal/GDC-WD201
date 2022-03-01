@@ -1,8 +1,6 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.contrib.auth.views import LogoutView
-
-# from tasks import views
 
 from tasks.views import (
     session_storage_view,
@@ -19,16 +17,23 @@ from tasks.views import (
     IndexView,
 )
 
-from tasks.apiviews import TaskListAPI, TaskViewSet
+from tasks.apiviews import TaskListAPI, TaskViewSet, TaskHistoryViewSet
 
-from rest_framework.routers import SimpleRouter
+from rest_framework_nested import routers
 
-router = SimpleRouter()
-router.register("api/task", TaskViewSet)
+router = routers.SimpleRouter()
+router.register(r"api/v1/task", TaskViewSet)
+
+task_router = routers.NestedSimpleRouter(router, r"api/v1/task", lookup="task")
+task_router.register(r"history", TaskHistoryViewSet, basename="history")
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("",  IndexView.as_view()),
+    # path("",  IndexView.as_view()),
+    # path("", include(router.urls)),
+    # path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path(r"", include(router.urls)),
+    path(r"", include(task_router.urls)),
     path("tasksapi/", TaskListAPI.as_view()),
     path("tasks/", GenericTaskView.as_view()),
     path("all-tasks/", GenericAllTaskView.as_view()),
@@ -42,4 +47,4 @@ urlpatterns = [
     path("user/login/", UserLoginView.as_view()),
     path("user/logout/", LogoutView.as_view()),
     path("sessiontest/", session_storage_view),
-] + router.urls
+]
