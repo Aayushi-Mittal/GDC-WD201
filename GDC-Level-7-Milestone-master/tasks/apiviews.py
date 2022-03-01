@@ -11,7 +11,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
-# from django_filters.rest_framework import DjangoFilterBackend, FilterSet, CharFilter, ChoiceFilter
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet, CharFilter, ChoiceFilter
 
 
 class UserSerializer(ModelSerializer):
@@ -28,17 +28,17 @@ class TaskSerializer(ModelSerializer):
         fields = ["title", "description", "completed","user"]
 
 
-# class TaskFilter(FilterSet):
-#     title = CharFilter(lookup_expr="icontains")
+class TaskFilter(FilterSet):
+    title = CharFilter(lookup_expr="icontains")
 
 
 class TaskViewSet(ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = (IsAuthenticated,)
-    # filter_backends = (DjangoFilterBackend,)
-    # filterset_class = TaskFilter
-    # status = ChoiceFilter(choices=STATUS_CHOICES)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TaskFilter
+    status = ChoiceFilter(choices=STATUS_CHOICES)
 
     def get_queryset(self):
         return Task.objects.filter(user=self.request.user, deleted=False)
