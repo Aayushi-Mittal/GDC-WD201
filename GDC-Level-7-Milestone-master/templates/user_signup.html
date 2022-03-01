@@ -8,7 +8,7 @@
 		<div class="fieldWrapper">
 			<label for="{{ form.username.id_for_label }}">Username:</label
 			><br />
-			<ul class="list-disc text-xs text-gray-500">
+			<ul class="mb-1 text-xs text-gray-500">
 				<li>
 					150 characters or fewer. Letters, digits and @/./+/-/_ only.
 				</li>
@@ -18,7 +18,7 @@
 		</div>
 		<div class="fieldWrapper">
 			<label for="{{ form.password.id_for_label }}">Password:</label>
-			<ul class="list-disc text-xs text-gray-500">
+			<ul class="mb-1 text-xs text-gray-500">
 				<li>
 					Your password can't be too similar to your other personal
 					information.
@@ -34,7 +34,7 @@
 			<label for="{{ form.confirm_password.id_for_label }}"
 				>Confirm Password:</label
 			>
-			<ul class="list-disc text-xs text-gray-500">
+			<ul class="mb-1 text-xs text-gray-500">
 				<li>Enter the same password as before, for verification.</li>
 			</ul>
 			{{ form.password2 }}
@@ -47,6 +47,7 @@
 		>
 			Signup
 		</button>
+		<i class="mt-2 text-base text-center text-gray-600 py-1">Already Registered? <a class="text-red-600" href="/user/login/">Login</a></i>
 	</div>
 </form>
 {% endblock content %}

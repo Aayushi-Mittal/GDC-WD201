@@ -28,7 +28,7 @@ router.register("api/task", TaskViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # path("index/",  IndexView.as_view()),
+    path("",  IndexView.as_view()),
     path("tasksapi/", TaskListAPI.as_view()),
     path("tasks/", GenericTaskView.as_view()),
     path("all-tasks/", GenericAllTaskView.as_view()),

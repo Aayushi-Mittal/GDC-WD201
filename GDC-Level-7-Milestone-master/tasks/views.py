@@ -26,7 +26,8 @@ class TaskCreateForm(ModelForm):
         self.fields["priority"].widget.attrs[
             "class"
         ] = "p-2 mb-2 bg-gray-200/75 rounded-lg"
-        self.fields["completed"].widget.attrs["class"] = "p-5 mb-2 bg-gray-200/75"
+        self.fields["status"].widget.attrs["class"] = "p-1 mb-2 bg-gray-200/75"
+        self.fields["completed"].widget.attrs["class"] = "p-5 mb-2 bg-gray-200/75 rounded-lg"
 
     def clean_title(self):
         title = self.cleaned_data["title"]
@@ -36,7 +37,7 @@ class TaskCreateForm(ModelForm):
 
     class Meta:
         model = Task
-        fields = ["title", "description", "priority", "completed"]
+        fields = ["title", "description", "priority", "status", "completed"]
 
 
 class AuthorizedTaskManager(LoginRequiredMixin):
@@ -91,6 +92,18 @@ def session_storage_view(request):
     return HttpResponse(
         f"total views is {total_views} and the user is {request.user} and the user is {request.user.is_authenticated}"
     )
+
+
+def count_tasks(self,request):
+    completed_tasks = Task.objects.filter(
+        status__in=["COMPLETED"], deleted=False, user=self.request.user
+    ).count()
+    total_tasks = Task.objects.filter(
+        deleted=False, user=self.request.user
+    ).count()
+    context={'completed_tasks': completed_tasks, 'total_tasks':total_tasks}
+    return render(request, 'base_tabs.html', context)
+
 
 class GenericTaskCompleteView(AuthorizedTaskManager, UpdateView):
     model = Task
@@ -164,7 +177,7 @@ class GenericTaskView(ListView, LoginRequiredMixin):
     def get_queryset(self):
         search_term = self.request.GET.get("search")
         tasks = Task.objects.filter(
-            completed=False, deleted=False, user=self.request.user
+            status__in=["PENDING", "IN_PROGRESS"], deleted=False, user=self.request.user
         ).order_by("priority")
         if search_term:
             tasks = tasks.filter(title__icontains=search_term)
@@ -184,12 +197,13 @@ class GenericAllTaskView(LoginRequiredMixin, ListView):
 
 
 class GenericCompletedTaskView(LoginRequiredMixin, ListView):
-    queryset = Task.objects.filter(completed=True, deleted=False)
+    queryset = Task.objects.filter(status=("COMPLETED"), deleted=False)
     template_name = "completed_tasks.html"
     context_object_name = "tasks"
     paginate_by = 5
 
     def get_queryset(self):
-        return Task.objects.filter(
-            completed=True, deleted=False, user=self.request.user
-        ).order_by("priority")
+        res = Task.objects.filter(
+            status__in=["COMPLETED"], deleted=False, user=self.request.user
+        )
+        return res.order_by("priority")

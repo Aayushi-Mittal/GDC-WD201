@@ -39,6 +39,24 @@
 		</div>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<div class="flex flex-wrap flex-row justify-end items-center">
+			{% if task.status == 'COMPLETED' %}
+				<p class="px-2 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+					completed
+				</p>
+			{% elif task.status == "IN_PROGRESS" %}
+				<p class="px-2 text-xs leading-5 font-semibold rounded-full bg-lime-100 text-lime-800">
+					in progress
+				</p>
+			{% elif task.status == "PENDING" %}
+				<p class="px-2 text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">
+					pending
+				</p>
+			{% else %}
+				<p class="px-2 text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+					cancelled
+				</p>
+			{% endif %}
+			&nbsp;&nbsp;
 			<a
 				href="/delete-task/{{ task.id }}"
 				class="p-2 bg-red-500 rounded-lg text-center text-white text-sm mr-2"
