@@ -7,14 +7,17 @@ from tasks.models import Task, STATUS_CHOICES, TaskHistory
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
+# https://django-filter.readthedocs.io/en/stable/ref/filters.html
 from django_filters.rest_framework import (
     DjangoFilterBackend,
     FilterSet,
     CharFilter,
     ChoiceFilter,
+    BooleanFilter,
+    DateFromToRangeFilter,
 )
 
 
@@ -31,7 +34,15 @@ class TaskSerializer(ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ["id", "title", "description", "priority", "completed", "status", "user"]
+        fields = [
+            "id",
+            "title",
+            "description",
+            "priority",
+            "completed",
+            "status",
+            "user",
+        ]
 
 
 class TaskHistorySerializer(ModelSerializer):
@@ -39,16 +50,21 @@ class TaskHistorySerializer(ModelSerializer):
     task = TaskSerializer(read_only=True)
 
     class Meta:
-        model = Task
+        model = TaskHistory
         fields = ["id", "task", "old_status", "new_status", "updation_date"]
 
 
 class TaskFilter(FilterSet):
     title = CharFilter(lookup_expr="icontains")
+    status = ChoiceFilter(choices=STATUS_CHOICES)
+    completed = BooleanFilter()
+
 
 class TaskHistoryFilter(FilterSet):
     old_status = ChoiceFilter(choices=STATUS_CHOICES)
     new_status = ChoiceFilter(choices=STATUS_CHOICES)
+    updation_date = DateFromToRangeFilter()
+
 
 class TaskViewSet(ModelViewSet):
     queryset = Task.objects.all()
@@ -65,13 +81,18 @@ class TaskViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class TaskHistoryViewSet(ModelViewSet):
+class TaskHistoryViewSet(ReadOnlyModelViewSet):
     queryset = TaskHistory.objects.all()
-    serializer_class = TaskHistorySerializer(read_only=True)
+    serializer_class = TaskHistorySerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TaskHistoryFilter
-    status = ChoiceFilter(choices=STATUS_CHOICES)
+
+    def get_queryset(self):
+        return TaskHistory.objects.filter(
+            task__user=self.request.user, task__pk=self.kwargs["task_pk"]
+        )
+
 
 class TaskListAPI(APIView):
     def get(self, request):
