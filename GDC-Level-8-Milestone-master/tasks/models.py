@@ -2,7 +2,7 @@ from django.db import models
 
 from django.contrib.auth.models import User
 
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
 
@@ -35,6 +35,21 @@ class TaskHistory(models.Model):
     old_status = models.CharField(max_length=100, choices=STATUS_CHOICES)
     new_status = models.CharField(max_length=100, choices=STATUS_CHOICES)
     updation_date = models.DateTimeField(auto_now=True)
+
+
+class Report(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(null=True, blank=True)
+    time = models.TimeField(default="00:00:00")
+    is_disabled = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s Report"
+
+
+@receiver(post_save, sender=User)
+def create_EmailTaskReport(sender, instance, **kwargs):
+    Report.objects.get_or_create(user=instance)
 
 
 @receiver(pre_save, sender=Task)
